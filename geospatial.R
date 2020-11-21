@@ -25,9 +25,9 @@ dataLabel <- "Data: Pleiades Project"
 # periods and features ####
 
 periods <- rbind(
-  c("archaic","750-550BC"),
-  c("classical","550-330BC"),
-  c("hellenistic-republican","330-30BC"),
+  c("archaic","750-550BCE"),
+  c("classical","550-330BCE"),
+  c("hellenistic-republican","330-30BCE"),
   c("roman","30BC-300CE"),
   c("late-antique","300-640CE")
 ) %>% as_tibble
@@ -72,12 +72,7 @@ for (i in seq_along(features$V1)) {
                    colour = landborder,
                    fill = land,
                    alpha = 1) +
-      geom_point(
-        data = locsRaw,
-        aes(reprLong, reprLat),
-        color = "grey70",
-        alpha = .75,
-        size = 1) + 
+      locPleiades + 
       geom_point(aes(y=reprLat,x=reprLong),
                  color="salmon",
                  alpha=.75,
@@ -134,5 +129,15 @@ ggplot(locPer) +
 sf_locPer <- locPer
 sp::coordinates(sf_locPer) <- c("reprLong", "reprLat")
 sp::proj4string(sf_locPer) <- sp::CRS("+init=epsg:4326")
-mapview(sf_locPer, zcol = "featureTypes", burst = TRUE) 
 
+# on how to use Github with R see https://r-pkgs.org/git.html
+remotes::install_github("r-spatial/mapview")
+mapviewOptions(
+  basemaps = c("Esri.WorldShadedRelief", "Stamen.TonerLite"),
+  raster.palette = grey.colors,
+  na.color = "magenta",
+  layers.control.pos = "topleft",
+  fgb = F
+)
+mvMap <- mapview(sf_locPer, zcol = "featureTypes", burst = TRUE) 
+mapshot(mvMap, url = paste0(getwd(), "/myMap.html"))
